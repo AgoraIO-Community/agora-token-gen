@@ -1,0 +1,21 @@
+{
+    "name": "Agora Token Generator",
+    "description": "an Agora Token Server using Golang & Gin to run as a webservice",
+    "repository": "https://github.com/AgoraIO-Community/agora-token-gen",
+    "logo": "https://www.agora.io/en/wp-content/themes/agora-main/images/agora-logo.svg",
+    "website": "http://www.agora.io",
+    "keywords": [ 
+      "agora", 
+      "Agora.io",
+      "DynamicKey",
+      "ChannelKey",
+      "RecordingKey",
+      "video",
+      "voice",
+      "communications",
+      "recording",
+      "ARS",
+      "token", "server", "go", "golang", "gin"
+    ],
+    "env": {}
+  }

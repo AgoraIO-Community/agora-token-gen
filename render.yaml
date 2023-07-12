@@ -1,0 +1,7 @@
+services:
+  - type: web
+    name: Agora Token Server
+    env: docker
+    repo: https://github.com/AgoraIO-Community/agora-token-gen.git
+    rootDir: .
+    plan: free
