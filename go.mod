@@ -1,4 +1,4 @@
-module agora-token-gen
+module github.com/AgoraIO-Community/agora-token-gen
 
 go 1.20
 

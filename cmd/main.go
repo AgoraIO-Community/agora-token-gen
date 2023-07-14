@@ -1,6 +1,6 @@
 package main
 
-import "agora-token-gen/service"
+import "github.com/AgoraIO-Community/agora-token-gen/service"
 
 func main() {
 	s := service.NewService()
