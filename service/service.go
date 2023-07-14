@@ -9,7 +9,6 @@ import (
 	"os/signal"
 	"time"
 
-	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 )
 
@@ -58,43 +57,18 @@ func NewService() *Service {
 		}
 	}
 
+	mux := http.NewServeMux()
+
+	mux.HandleFunc("/rtc", RtcToken)
+	mux.HandleFunc("/rtm", RtmToken)
+	mux.HandleFunc("/chat", ChatToken)
+
 	s := &Service{
 		Sigint: make(chan os.Signal, 1),
 		Server: &http.Server{
-			Addr: fmt.Sprintf(":%s", serverPort),
+			Addr:    fmt.Sprintf(":%s", serverPort),
+			Handler: mux,
 		},
 	}
-
-	api := gin.Default()
-
-	api.POST("rtc/", s.rtcToken)
-	api.POST("rtm/", s.rtmToken)
-	api.POST("chat/", s.chatToken)
-
-	s.Server.Handler = api
 	return s
-}
-
-type RtcTokenReq struct {
-	AppId          string `json:"appId"`
-	AppCertificate string `json:"certificate"`
-	Channel        string `json:"channel"`
-	Uid            string `json:"uid"`
-	Role           string `json:"role,omitempty"`
-	Expiration     int    `json:"expire,omitempty"`
-}
-
-type RtmTokenReq struct {
-	AppId          string `json:"appId"`
-	AppCertificate string `json:"certificate"`
-	Channel        string `json:"channel"`
-	Uid            string `json:"uid"`
-	Expiration     int    `json:"expire,omitempty"`
-}
-
-type ChatTokenReq struct {
-	AppId          string `json:"appId"`
-	AppCertificate string `json:"certificate"`
-	Uid            string `json:"uid"`
-	Expiration     int    `json:"expire,omitempty"`
 }

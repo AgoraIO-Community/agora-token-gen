@@ -3,19 +3,48 @@ package service
 import (
 	"encoding/json"
 	"log"
+	"net/http"
 	"strconv"
 	"time"
 
 	"github.com/AgoraIO-Community/go-tokenbuilder/chatTokenBuilder"
 	rtctokenbuilder2 "github.com/AgoraIO-Community/go-tokenbuilder/rtctokenbuilder"
 	rtmtokenbuilder2 "github.com/AgoraIO-Community/go-tokenbuilder/rtmtokenbuilder"
-	"github.com/gin-gonic/gin"
 )
 
-func (s *Service) rtcToken(c *gin.Context) {
+type RtcTokenReq struct {
+	AppId          string `json:"appId"`
+	AppCertificate string `json:"certificate"`
+	Channel        string `json:"channel"`
+	Uid            string `json:"uid"`
+	Role           string `json:"role,omitempty"`
+	Expiration     int    `json:"expire,omitempty"`
+}
+
+type RtmTokenReq struct {
+	AppId          string `json:"appId"`
+	AppCertificate string `json:"certificate"`
+	Channel        string `json:"channel"`
+	Uid            string `json:"uid"`
+	Expiration     int    `json:"expire,omitempty"`
+}
+
+type ChatTokenReq struct {
+	AppId          string `json:"appId"`
+	AppCertificate string `json:"certificate"`
+	Uid            string `json:"uid"`
+	Expiration     int    `json:"expire,omitempty"`
+}
+
+func RtcToken(w http.ResponseWriter, r *http.Request) {
 	log.Println("Generating RTC token")
 	var tokenRequest RtcTokenReq
-	json.NewDecoder(c.Request.Body).Decode(&tokenRequest)
+
+	err := json.NewDecoder(r.Body).Decode(&tokenRequest)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
 
 	expireTimestamp := expirationFromNow(tokenRequest.Expiration)
 
@@ -43,69 +72,90 @@ func (s *Service) rtcToken(c *gin.Context) {
 	}
 
 	if tokenErr != nil {
-		log.Println(tokenErr) // token failed to generate
-		c.Error(tokenErr)
-		errMsg := "Error Generating RTC token - " + tokenErr.Error()
-		c.AbortWithStatusJSON(400, gin.H{
-			"status": 400,
-			"error":  errMsg,
+		log.Println(tokenErr)
+
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"status": http.StatusBadRequest,
+			"error":  "Error generating RTC token: " + tokenErr.Error(),
 		})
-	} else {
-		log.Println("RTC Token generated")
-		c.JSON(200, gin.H{
-			"rtcToken": rtcToken,
-		})
+		return
 	}
+	log.Println("RTC Token generated")
+	json.NewEncoder(w).Encode(map[string]interface{}{
+		"rtcToken": rtcToken,
+	})
 }
 
-func (s *Service) rtmToken(c *gin.Context) {
-	log.Println("Generating RTC token")
+func RtmToken(w http.ResponseWriter, r *http.Request) {
+	log.Println("Generating RTM token")
 	var tokenRequest RtmTokenReq
-	json.NewDecoder(c.Request.Body).Decode(&tokenRequest)
-
+	err := json.NewDecoder(r.Body).Decode(&tokenRequest)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
 	expireTimestamp := expirationFromNow(tokenRequest.Expiration)
 
-	rtmToken, tokenErr := rtmtokenbuilder2.BuildToken(tokenRequest.AppId, tokenRequest.AppCertificate, tokenRequest.Uid, expireTimestamp)
+	rtmToken, tokenErr := rtmtokenbuilder2.BuildToken(
+		tokenRequest.AppId,
+		tokenRequest.AppCertificate,
+		tokenRequest.Uid,
+		expireTimestamp,
+	)
 
 	if tokenErr != nil {
-		log.Println(tokenErr) // token failed to generate
-		c.Error(tokenErr)
-		errMsg := "Error Generating RTC token - " + tokenErr.Error()
-		c.AbortWithStatusJSON(400, gin.H{
-			"status": 400,
-			"error":  errMsg,
+		log.Println(tokenErr)
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"status": http.StatusBadRequest,
+			"error":  "Error generating RTC token: " + tokenErr.Error(),
 		})
-	} else {
-		log.Println("RTC Token generated")
-		c.JSON(200, gin.H{
-			"rtmToken": rtmToken,
-		})
+		return
 	}
+
+	log.Println("RTC Token generated")
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(map[string]interface{}{
+		"rtmToken": rtmToken,
+	})
 }
 
-func (s *Service) chatToken(c *gin.Context) {
+func ChatToken(w http.ResponseWriter, r *http.Request) {
 	log.Println("Generating Chat token")
 	var tokenRequest ChatTokenReq
-	json.NewDecoder(c.Request.Body).Decode(&tokenRequest)
+	err := json.NewDecoder(r.Body).Decode(&tokenRequest)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
 
 	expireTimestamp := expirationFromNow(tokenRequest.Expiration)
 
-	rtmToken, tokenErr := chatTokenBuilder.BuildChatUserToken(tokenRequest.AppId, tokenRequest.AppCertificate, tokenRequest.Uid, expireTimestamp)
+	chatToken, tokenErr := chatTokenBuilder.BuildChatUserToken(
+		tokenRequest.AppId,
+		tokenRequest.AppCertificate,
+		tokenRequest.Uid,
+		expireTimestamp,
+	)
 
 	if tokenErr != nil {
-		log.Println(tokenErr) // token failed to generate
-		c.Error(tokenErr)
-		errMsg := "Error Generating Chat token - " + tokenErr.Error()
-		c.AbortWithStatusJSON(400, gin.H{
-			"status": 400,
-			"error":  errMsg,
+		log.Println(tokenErr)
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"status": http.StatusBadRequest,
+			"error":  "Error generating chat token: " + tokenErr.Error(),
 		})
-	} else {
-		log.Println("RTC Token generated")
-		c.JSON(200, gin.H{
-			"chatToken": rtmToken,
-		})
+		return
 	}
+
+	log.Println("Chat token generated")
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(map[string]interface{}{
+		"chatToken": chatToken,
+	})
 }
 
 func expirationFromNow(expiration int) uint32 {
