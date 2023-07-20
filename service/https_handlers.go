@@ -183,7 +183,7 @@ func ChatToken(w http.ResponseWriter, r *http.Request) {
 }
 
 // Create Whiteboard SDK token
-func SDKToken(w http.ResponseWriter, r *http.Request) {
+func WhiteboardSDKToken(w http.ResponseWriter, r *http.Request) {
 	log.Println("Generating Whiteboard SDK token")
 	var tokenRequest SDKTokenReq
 	err := json.NewDecoder(r.Body).Decode(&tokenRequest)
@@ -212,7 +212,7 @@ func SDKToken(w http.ResponseWriter, r *http.Request) {
 }
 
 // Create Whiteboard Room token
-func RoomToken(w http.ResponseWriter, r *http.Request) {
+func WhiteboardRoomToken(w http.ResponseWriter, r *http.Request) {
 	log.Println("Generating Whiteboard Room token")
 	var tokenRequest RoomTokenReq
 	err := json.NewDecoder(r.Body).Decode(&tokenRequest)
@@ -242,7 +242,7 @@ func RoomToken(w http.ResponseWriter, r *http.Request) {
 }
 
 // Create Whiteboard Task token
-func TaskToken(w http.ResponseWriter, r *http.Request) {
+func WhiteboardTaskToken(w http.ResponseWriter, r *http.Request) {
 	log.Println("Generating Whiteboard task token")
 	var tokenRequest TaskTokenReq
 	err := json.NewDecoder(r.Body).Decode(&tokenRequest)
