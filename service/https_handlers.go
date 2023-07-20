@@ -37,14 +37,14 @@ type ChatTokenReq struct {
 	Expiration     int    `json:"expire,omitempty"`
 }
 
-type SDKTokenReq struct {
+type WhiteboardSDKTokenReq struct {
 	Role       string `json:"role"`
 	AccessKey  string `json:"accessKey"`
 	SecretKey  string `json:"SecretKey"`
 	Expiration int    `json:"expire,omitempty"`
 }
 
-type RoomTokenReq struct {
+type WhiteboardRoomTokenReq struct {
 	Role       string `json:"role"`
 	AccessKey  string `json:"accessKey"`
 	SecretKey  string `json:"SecretKey"`
@@ -52,7 +52,7 @@ type RoomTokenReq struct {
 	RoomUuid   string `json:"roomuuid"`
 }
 
-type TaskTokenReq struct {
+type WhiteboardTaskTokenReq struct {
 	Role       string `json:"role"`
 	AccessKey  string `json:"accessKey"`
 	SecretKey  string `json:"SecretKey"`
@@ -185,7 +185,7 @@ func ChatToken(w http.ResponseWriter, r *http.Request) {
 // Create Whiteboard SDK token
 func WhiteboardSDKToken(w http.ResponseWriter, r *http.Request) {
 	log.Println("Generating Whiteboard SDK token")
-	var tokenRequest SDKTokenReq
+	var tokenRequest WhiteboardSDKTokenReq
 	err := json.NewDecoder(r.Body).Decode(&tokenRequest)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
@@ -214,7 +214,7 @@ func WhiteboardSDKToken(w http.ResponseWriter, r *http.Request) {
 // Create Whiteboard Room token
 func WhiteboardRoomToken(w http.ResponseWriter, r *http.Request) {
 	log.Println("Generating Whiteboard Room token")
-	var tokenRequest RoomTokenReq
+	var tokenRequest WhiteboardRoomTokenReq
 	err := json.NewDecoder(r.Body).Decode(&tokenRequest)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
@@ -244,7 +244,7 @@ func WhiteboardRoomToken(w http.ResponseWriter, r *http.Request) {
 // Create Whiteboard Task token
 func WhiteboardTaskToken(w http.ResponseWriter, r *http.Request) {
 	log.Println("Generating Whiteboard task token")
-	var tokenRequest TaskTokenReq
+	var tokenRequest WhiteboardTaskTokenReq
 	err := json.NewDecoder(r.Body).Decode(&tokenRequest)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
