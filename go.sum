@@ -1,4 +1,8 @@
 github.com/AgoraIO-Community/go-tokenbuilder v1.2.0 h1:Ktlv7n8PhmSap3tgNxjNHO8hj/qydUIj4UOFF8tRxos=
 github.com/AgoraIO-Community/go-tokenbuilder v1.2.0/go.mod h1:xqPdaiFG00M1hNN/CCYh8j+NTmkiJsQtqYdf4YAlncA=
+github.com/google/uuid v1.1.2 h1:EVhdT+1Kseyi1/pUmXKaFxYsDNy9RQYkMWRH68J/W7Y=
+github.com/google/uuid v1.1.2/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+yHo=
 github.com/joho/godotenv v1.5.1 h1:7eLL/+HRGLY0ldzfGMeQkb7vMd0as4CfYvUVzLqw0N0=
 github.com/joho/godotenv v1.5.1/go.mod h1:f4LDr5Voq0i2e/R5DDNOoa2zzDfwtkZa6DnEwAbqwq4=
+github.com/netless-io/netless-token/golang v0.0.0-20220615025308-771ff36bfc1e h1:Ax7sgcxR2imc/YLr5LlWWvnC9jQvL1pF49Iixgn6V5g=
+github.com/netless-io/netless-token/golang v0.0.0-20220615025308-771ff36bfc1e/go.mod h1:S1Qba7Owf/1hqvt59TLA2oU++JlBcJrQnvsJJ/SJhFA=
