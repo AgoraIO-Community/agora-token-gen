@@ -62,6 +62,9 @@ func NewService() *Service {
 	mux.HandleFunc("/rtc", RtcToken)
 	mux.HandleFunc("/rtm", RtmToken)
 	mux.HandleFunc("/chat", ChatToken)
+	mux.HandleFunc("/sdk-token", SDKToken)
+	mux.HandleFunc("/room-token", RoomToken)
+	mux.HandleFunc("/task-token", TaskToken)
 
 	s := &Service{
 		Sigint: make(chan os.Signal, 1),

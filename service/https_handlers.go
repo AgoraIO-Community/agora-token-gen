@@ -10,6 +10,7 @@ import (
 	"github.com/AgoraIO-Community/go-tokenbuilder/chatTokenBuilder"
 	rtctokenbuilder2 "github.com/AgoraIO-Community/go-tokenbuilder/rtctokenbuilder"
 	rtmtokenbuilder2 "github.com/AgoraIO-Community/go-tokenbuilder/rtmtokenbuilder"
+	whiteboardtokenbuilder "github.com/netless-io/netless-token/golang"
 )
 
 type RtcTokenReq struct {
@@ -34,6 +35,29 @@ type ChatTokenReq struct {
 	AppCertificate string `json:"certificate"`
 	Uid            string `json:"uid"`
 	Expiration     int    `json:"expire,omitempty"`
+}
+
+type SDKTokenReq struct {
+	Role       string `json:"role"`
+	AccessKey  string `json:"accessKey"`
+	SecretKey  string `json:"SecretKey"`
+	Expiration int    `json:"expire,omitempty"`
+}
+
+type RoomTokenReq struct {
+	Role       string `json:"role"`
+	AccessKey  string `json:"accessKey"`
+	SecretKey  string `json:"SecretKey"`
+	Expiration int    `json:"expire,omitempty"`
+	RoomUuid   string `json:"roomuuid"`
+}
+
+type TaskTokenReq struct {
+	Role       string `json:"role"`
+	AccessKey  string `json:"accessKey"`
+	SecretKey  string `json:"SecretKey"`
+	Expiration int    `json:"expire,omitempty"`
+	TaskUuid   string `json:"taskuuid"`
 }
 
 func RtcToken(w http.ResponseWriter, r *http.Request) {
@@ -155,6 +179,95 @@ func ChatToken(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(map[string]interface{}{
 		"chatToken": chatToken,
+	})
+}
+
+// Create Whiteboard SDK token
+func SDKToken(w http.ResponseWriter, r *http.Request) {
+	log.Println("Generating Whiteboard SDK token")
+	var tokenRequest SDKTokenReq
+	err := json.NewDecoder(r.Body).Decode(&tokenRequest)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	content := whiteboardtokenbuilder.SDKContent{
+		Role: tokenRequest.Role,
+	}
+
+	sdkToken := whiteboardtokenbuilder.SDKToken(
+		tokenRequest.AccessKey,
+		tokenRequest.SecretKey,
+		int64(tokenRequest.Expiration),
+		&content,
+	)
+
+	log.Println("Whiteboard SDK token generated")
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(map[string]interface{}{
+		"sdkToken": sdkToken,
+	})
+}
+
+// Create Whiteboard Room token
+func RoomToken(w http.ResponseWriter, r *http.Request) {
+	log.Println("Generating Whiteboard Room token")
+	var tokenRequest RoomTokenReq
+	err := json.NewDecoder(r.Body).Decode(&tokenRequest)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	content := whiteboardtokenbuilder.RoomContent{
+		Role: tokenRequest.Role,
+		Uuid: tokenRequest.RoomUuid,
+	}
+
+	roomToken := whiteboardtokenbuilder.RoomToken(
+		tokenRequest.AccessKey,
+		tokenRequest.SecretKey,
+		int64(tokenRequest.Expiration),
+		&content,
+	)
+
+	log.Println("Whiteboard room token generated")
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(map[string]interface{}{
+		"roomToken": roomToken,
+	})
+}
+
+// Create Whiteboard Task token
+func TaskToken(w http.ResponseWriter, r *http.Request) {
+	log.Println("Generating Whiteboard task token")
+	var tokenRequest TaskTokenReq
+	err := json.NewDecoder(r.Body).Decode(&tokenRequest)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	content := whiteboardtokenbuilder.TaskContent{
+		Role: tokenRequest.Role,
+		Uuid: tokenRequest.TaskUuid,
+	}
+
+	taskToken := whiteboardtokenbuilder.TaskToken(
+		tokenRequest.AccessKey,
+		tokenRequest.SecretKey,
+		int64(tokenRequest.Expiration),
+		&content,
+	)
+
+	log.Println("Whiteboard task token generated")
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(map[string]interface{}{
+		"taskToken": taskToken,
 	})
 }
 
