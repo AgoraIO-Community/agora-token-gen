@@ -25,7 +25,7 @@ type RtcTokenReq struct {
 type RtmTokenReq struct {
 	AppId          string `json:"appId"`
 	AppCertificate string `json:"certificate"`
-	Channel        string `json:"channel"`
+	Channel        string `json:"channel,omitempty"`
 	Uid            string `json:"uid"`
 	Expiration     int    `json:"expire,omitempty"`
 }
@@ -126,6 +126,7 @@ func RtmToken(w http.ResponseWriter, r *http.Request) {
 		tokenRequest.AppCertificate,
 		tokenRequest.Uid,
 		expireTimestamp,
+		tokenRequest.Channel,
 	)
 
 	if tokenErr != nil {
@@ -138,7 +139,7 @@ func RtmToken(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	log.Println("RTC Token generated")
+	log.Println("RTM Token generated")
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(map[string]interface{}{
