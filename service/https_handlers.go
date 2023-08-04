@@ -5,7 +5,6 @@ import (
 	"log"
 	"net/http"
 	"strconv"
-	"time"
 
 	"github.com/AgoraIO-Community/go-tokenbuilder/chatTokenBuilder"
 	rtctokenbuilder2 "github.com/AgoraIO-Community/go-tokenbuilder/rtctokenbuilder"
@@ -25,7 +24,7 @@ type RtcTokenReq struct {
 type RtmTokenReq struct {
 	AppId          string `json:"appId"`
 	AppCertificate string `json:"certificate"`
-	Channel        string `json:"channel"`
+	Channel        string `json:"channel,omitempty"`
 	Uid            string `json:"uid"`
 	Expiration     int    `json:"expire,omitempty"`
 }
@@ -70,7 +69,7 @@ func RtcToken(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	expireTimestamp := expirationFromNow(tokenRequest.Expiration)
+	expireDelta := expirationFromNow(tokenRequest.Expiration)
 
 	var userRole rtctokenbuilder2.Role
 	if tokenRequest.Role == "publisher" {
@@ -86,12 +85,12 @@ func RtcToken(w http.ResponseWriter, r *http.Request) {
 	if parseErr != nil {
 		rtcToken, tokenErr = rtctokenbuilder2.BuildTokenWithAccount(
 			tokenRequest.AppId, tokenRequest.AppCertificate, tokenRequest.Channel,
-			tokenRequest.Uid, userRole, expireTimestamp,
+			tokenRequest.Uid, userRole, expireDelta,
 		)
 	} else {
 		rtcToken, tokenErr = rtctokenbuilder2.BuildTokenWithUid(
 			tokenRequest.AppId, tokenRequest.AppCertificate, tokenRequest.Channel,
-			uint32(uid64), userRole, expireTimestamp,
+			uint32(uid64), userRole, expireDelta,
 		)
 	}
 
@@ -119,13 +118,14 @@ func RtmToken(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-	expireTimestamp := expirationFromNow(tokenRequest.Expiration)
+	expireDelta := expirationFromNow(tokenRequest.Expiration)
 
 	rtmToken, tokenErr := rtmtokenbuilder2.BuildToken(
 		tokenRequest.AppId,
 		tokenRequest.AppCertificate,
 		tokenRequest.Uid,
-		expireTimestamp,
+		expireDelta,
+		tokenRequest.Channel,
 	)
 
 	if tokenErr != nil {
@@ -138,7 +138,7 @@ func RtmToken(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	log.Println("RTC Token generated")
+	log.Println("RTM Token generated")
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(map[string]interface{}{
@@ -155,13 +155,13 @@ func ChatToken(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	expireTimestamp := expirationFromNow(tokenRequest.Expiration)
+	expireDelta := expirationFromNow(tokenRequest.Expiration)
 
 	chatToken, tokenErr := chatTokenBuilder.BuildChatUserToken(
 		tokenRequest.AppId,
 		tokenRequest.AppCertificate,
 		tokenRequest.Uid,
-		expireTimestamp,
+		expireDelta,
 	)
 
 	if tokenErr != nil {
@@ -275,8 +275,5 @@ func expirationFromNow(expiration int) uint32 {
 	if expiration == 0 {
 		expiration = 86400
 	}
-	expireTimeInSeconds := uint32(expiration)
-	currentTimestamp := uint32(time.Now().UTC().Unix())
-	expireTimestamp := currentTimestamp + expireTimeInSeconds
-	return expireTimestamp
+	return uint32(expiration)
 }
